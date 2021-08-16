@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import flask_sqlalchemy
 
@@ -10,7 +10,7 @@ app.config['SQLALCHEMY TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-class Data(db.Model):
+class Animal(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     species = db.Column(db.String(40))
     age = db.Column(db.Integer)
@@ -31,6 +31,21 @@ class Data(db.Model):
 def Index():
     return render_template("index.html")
 
+# routes to db
+@app.route('/api/animals', methods=['POST'])
+def insert():
+    if request.method == 'POST':
+        species = request.form['species']
+        age = request.form['age']
+        gender = request.form['gender']
+        name = request.form['name']
+        exhibits_id = request.form['exhibit']
+
+        animal_data = Animal(species, age, gender, name, exhibits_id)
+        db.session.add(animal_data)
+        db.session.commit()
+
+        return redirect(url_for('Index'))
 
 if __name__ == "__main__":
     app.run(debug=True)
