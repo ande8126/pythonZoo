@@ -12,7 +12,7 @@ connection = psycopg2.connect(
 # jinja to index
 @app.route('/')
 def Index():
-    # animals = ?
+    # animals = 
     # print(animals)
     # animals = Animal(animals_json)
     return render_template("index.html")
@@ -40,9 +40,9 @@ def list_animals():
     #convert records to objects with RealDictCursor
     cursor = connection.cursor(cursor_factory=RealDictCursor)
     #query text
-    postgreSQL_select_Query = "SELECT * FROM animals;"
+    queryText = "SELECT animals.species, animals.age, animals.gender, animals.name, exhibits.name AS exhibit FROM animals JOIN exhibits ON exhibits.id = animals.exhibits_id;"
     #send it over
-    cursor.execute(postgreSQL_select_Query)
+    cursor.execute(queryText)
     #select rows
     animals = cursor.fetchall()
     #response
@@ -85,7 +85,7 @@ def add():
     # OLD: return redirect(url_for('Index'))
 
 #DELETE
-@app.route( '/api/animals', methods=['DELETE'])
+@app.route( '/api/animals/<id>', methods=['DELETE'])
 def remove_animal( id ):
     try:
         print( id )
