@@ -9,10 +9,29 @@ connection = psycopg2.connect(
     port='5432',
     database='zooapp'
 )
-
+# jinja to index
 @app.route('/')
 def Index():
+    # animals = ?
+    # print(animals)
+    # animals = Animal(animals_json)
     return render_template("index.html")
+
+# @app.route('/api/animals')
+# def getAnimals():
+#     animals = request.data()
+#     print( animals )
+
+
+#class
+class Animal:
+    def __init__(self, json):
+        self.id = json['id']
+        self.species = json['species']
+        self.age = json['age']
+        self.age = json['gender']
+        self.age = json['name']
+        self.exhibits = json['exhibits_id']
 
 # routes to db
 #GET
@@ -62,11 +81,29 @@ def add():
         if(cursor):
             cursor.close()
 
-    flash("Animal added to your zoo")
+    # flash("Animal added to your zoo")
+    # OLD: return redirect(url_for('Index'))
 
-    return redirect(url_for('Index'))
+#DELETE
+@app.route( '/api/animals', methods=['DELETE'])
+def remove_animal( id ):
+    try:
+        print( id )
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+        queryText = 'DELETE FROM animals WHERE id = %s'
+        cursor.execute(queryText, id)
+        deleted_rows = cursor.rowcount
+        print( deleted_rows, 'Animal removed' )
+        connection.commit()
+        cursor.close()
+    except(Exception, psycopg2.DatabaseError) as err:
+        print( 'Remove animal failed on server', err )
+    finally:
+        if connection is not None:
+            connection.close()
 
-    
+
 
 if __name__ == "__main__":
     app.run(debug=True)
+
