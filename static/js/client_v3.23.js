@@ -3,7 +3,8 @@ $( document ).ready( onReady );
 function onReady(){
     console.log( 'in jq');
     getAnimals();
-    $( '#animalTable' ).on( 'click', '.removeButton', removeAnimal )
+    $( '#animalTables' ).on( 'click', '.removeButton', removeAnimal )
+    $( '#animalTables' ).on( 'click', '.editButton', editAnimal )
 }
 
 function getAnimals(){
@@ -15,28 +16,47 @@ function getAnimals(){
         console.log( 'back from GET with response', response );
         //assign the two table DOM elements to new variables for output
         let el = $( '#animalsOut' );
+        let elTwo = $( '#holdingOut' );
         //empty
         el.empty();
+        elTwo.empty();
         //loop thru all of the database
         for ( let i=0; i<response.length; i++ ){
             let animal = response[i];
             // let checkMark = `<button data-id="${task.id}" class="checkOffTaskButton">&#10004</button>`;
             // checkMark = `-`
-            el.append(`
-            <tr data-id=${animal.id}>
-                <td>${animal.id}</td>
-                <td>${animal.species}</td>
-                <td>${animal.age}</td>
-                <td>${animal.gender}</td>
-                <td>${animal.name}</td>
-                <td>
-                ${animal.exhibit}
-                </td>
-                <td>
-                    <button class="removeButton">Remove</button>
-                </td>
-            </tr>
-            `)
+            if ( animal.on_display === true ){
+                el.append(`
+                <tr data-id=${animal.id}>
+                    <td>${animal.id}</td>
+                    <td>${animal.species}</td>
+                    <td>${animal.age}</td>
+                    <td>${animal.gender}</td>
+                    <td>${animal.name}</td>
+                    <td>${animal.exhibit}</td>
+                    <td>
+                        <button class="editButton" data-id="${animal.id}">Move</button>
+                        <button class="removeButton">Remove</button>
+                    </td>
+                </tr>
+                `)
+            }
+            else if ( animal.on_display === false ){
+                elTwo.append(`
+                <tr data-id=${animal.id}>
+                    <td>${animal.id}</td>
+                    <td>${animal.species}</td>
+                    <td>${animal.age}</td>
+                    <td>${animal.gender}</td>
+                    <td>${animal.name}</td>
+                    <td>${animal.exhibit}</td>
+                    <td>
+                        <button class="editButton" data-id="${animal.id}">Move</button>
+                        <button class="removeButton">Remove</button>
+                    </td>
+                </tr>
+                `)
+            }
         }//end status marked true (task complete)
     }).catch( function( err ){
             console.log( err );
@@ -61,19 +81,18 @@ function removeAnimal(){
     })//end ajax
 }
 
-function changeExhibit(){
+function editAnimal(){
     const myId = $( this ).data( 'id' );
-    console.log('in changeExhibit w/', myId, myId.val());
+    console.log('in editAnimal w/', myId, $(this), $(this).data );
     //send variable to server/db w/ajax PUT
     $.ajax({
         method: 'PUT',
-        url: '/api/animals' + myId,
-        data: myId.val()
+        url: '/api/animals/' + myId,
     }).then( function( response ){
         console.log( 'back from server with PUT', response );
         getTasks();
     }).catch( function( err ){
         console.log( err );
-        alert( 'Error in changeExhibit', err );
+        alert( 'Error in editAnimal', err );
     })//end ajax
 }//end checkOffTask

@@ -7,7 +7,7 @@ app = Flask(__name__)
 connection = psycopg2.connect(
     host='Localhost',
     port='5432',
-    database='zooapp'
+    database='zooapp2'
 )
 # jinja to index
 @app.route('/')
@@ -40,7 +40,7 @@ def list_animals():
     #convert records to objects with RealDictCursor
     cursor = connection.cursor(cursor_factory=RealDictCursor)
     #query text
-    queryText = "SELECT animals.id, animals.species, animals.age, animals.gender, animals.name, exhibits.name AS exhibit FROM animals JOIN exhibits ON exhibits.id = animals.exhibits_id;"
+    queryText = "SELECT animals.id, animals.species, animals.age, animals.gender, animals.name, exhibits.name AS exhibit, animals.on_display FROM animals JOIN exhibits ON exhibits.id = animals.exhibits_id;"
     #send it over
     cursor.execute(queryText)
     #select rows
@@ -100,9 +100,11 @@ def remove_animal( id ):
 def update_exhibit( id ):
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
-        print( 'in PUT w:', request.json['exhibit_id'])
-        queryText = 'UPDATE "animals" SET "exhibit_id" = %s WHERE "id"=%s;'
-        # cursor.execute(queryText, )
+        queryText = 'UPDATE "animals" SET "on_display" = NOT on_display WHERE "id"=%s;'
+        cursor.execute(queryText, id)
+        print( 'animal moved' )
+        connection.commit()
+        cursor.close()
     except(Exception, psycopg2.DatabaseError) as err:
         print( 'PUT animal failed on server', err )
     finally:

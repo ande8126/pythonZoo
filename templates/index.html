@@ -51,18 +51,36 @@
                     {% endfor %}
                     {% endif %}
                     {% endwith %} -->
-                    <table id="animalTable" class="table table-hover table-dark">
-                        <thead>
-                            <th>ID</th>
-                            <th>Species</th>
-                            <th>Age</th>
-                            <th>Gender</th>
-                            <th>Name</th>
-                            <th>Exhibit</th>
-                            <th>Action</th>
-                        </thead>                 
-                    <tbody id="animalsOut"></tbody>
-                </table>
+                    
+                    <div id="animalTables">
+                        <h3>On display</h3>
+                        <table class="table table-hover table-dark">
+                            <thead>
+                                <th>ID</th>
+                                <th>Species</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Name</th>
+                                <th>Exhibit</th>
+                                <th>Action</th>
+                            </thead>                 
+                            <tbody id="animalsOut"></tbody>
+                        </table>
+                        
+                        <h3>Not on display</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <th>ID</th>
+                                <th>Species</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Name</th>
+                                <th>Exhibit</th>
+                                <th>Action</th>
+                            </thead>                 
+                            <tbody id="holdingOut"></tbody>
+                        </table>
+                    </div>
             </div>
         </div>
     </div>
