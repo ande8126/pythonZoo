@@ -90,7 +90,7 @@ function editAnimal(){
         url: '/api/animals/' + myId,
     }).then( function( response ){
         console.log( 'back from server with PUT', response );
-        getTasks();
+        getAnimals();
     }).catch( function( err ){
         console.log( err );
         alert( 'Error in editAnimal', err );

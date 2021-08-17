@@ -12,26 +12,8 @@ connection = psycopg2.connect(
 # jinja to index
 @app.route('/')
 def Index():
-    # animals = 
-    # print(animals)
-    # animals = Animal(animals_json)
     return render_template("index.html")
 
-# @app.route('/api/animals')
-# def getAnimals():
-#     animals = request.data()
-#     print( animals )
-
-
-#class
-class Animal:
-    def __init__(self, json):
-        self.id = json['id']
-        self.species = json['species']
-        self.age = json['age']
-        self.age = json['gender']
-        self.age = json['name']
-        self.exhibits = json['exhibits_id']
 
 # routes to db
 #GET
@@ -82,13 +64,14 @@ def add():
 def remove_animal( id ):
     try:
         print( id )
-        cursor = connection.cursor(cursor_factory=RealDictCursor)
-        queryText = 'DELETE FROM animals WHERE id = %s;'
-        cursor.execute(queryText, id)
+        cursor = connection.cursor()
+        queryText = f'DELETE FROM animals WHERE id = {id}'
+        cursor.execute(queryText)
         deleted_rows = cursor.rowcount
-        print( deleted_rows, 'Animal removed' )
-        connection.commit()
+        print( deleted_rows, 'Animal removed' ) 
         cursor.close()
+        result = { 'status' : 'DELETED' }
+        return jsonify(result), 200 
     except(Exception, psycopg2.DatabaseError) as err:
         print( 'Remove animal failed on server', err )
     finally:
@@ -99,12 +82,17 @@ def remove_animal( id ):
 @app.route( '/api/animals/<id>', methods=['PUT'])
 def update_exhibit( id ):
     try:
-        cursor = connection.cursor(cursor_factory=RealDictCursor)
-        queryText = 'UPDATE "animals" SET "on_display" = NOT on_display WHERE "id"=%s;'
-        cursor.execute(queryText, id)
-        print( 'animal moved' )
+        animal_id = id
+        cursor = connection.cursor()
+        queryText = f'UPDATE animals SET on_display = false WHERE id={animal_id}'
+        cursor.execute(queryText)
+        print( 'animal moved', queryText, id )
         connection.commit()
+        count = cursor.rowcount
         cursor.close()
+        print( count, 'update worked' )
+        result = { 'status' : 'UPDATED' }
+        return jsonify(result), 200
     except(Exception, psycopg2.DatabaseError) as err:
         print( 'PUT animal failed on server', err )
     finally:
