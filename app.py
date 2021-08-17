@@ -40,7 +40,7 @@ def list_animals():
     #convert records to objects with RealDictCursor
     cursor = connection.cursor(cursor_factory=RealDictCursor)
     #query text
-    queryText = "SELECT animals.species, animals.age, animals.gender, animals.name, exhibits.name AS exhibit FROM animals JOIN exhibits ON exhibits.id = animals.exhibits_id;"
+    queryText = "SELECT animals.id, animals.species, animals.age, animals.gender, animals.name, exhibits.name AS exhibit FROM animals JOIN exhibits ON exhibits.id = animals.exhibits_id;"
     #send it over
     cursor.execute(queryText)
     #select rows
@@ -57,10 +57,6 @@ def add():
     gender = request.form['gender']
     name = request.form['name']
     exhibits_id = request.form['exhibit']
-    #SQL ALCHEMY STUFF:
-    # animal_data = Animal(species, age, gender, name, exhibits_id)
-    # db.session.add(animal_data)
-    # db.session.commit()
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
         print(species, age, gender, name, exhibits_id)
@@ -81,16 +77,13 @@ def add():
         if(cursor):
             cursor.close()
 
-    # flash("Animal added to your zoo")
-    # OLD: return redirect(url_for('Index'))
-
 #DELETE
 @app.route( '/api/animals/<id>', methods=['DELETE'])
 def remove_animal( id ):
     try:
         print( id )
         cursor = connection.cursor(cursor_factory=RealDictCursor)
-        queryText = 'DELETE FROM animals WHERE id = %s'
+        queryText = 'DELETE FROM animals WHERE id = %s;'
         cursor.execute(queryText, id)
         deleted_rows = cursor.rowcount
         print( deleted_rows, 'Animal removed' )
@@ -99,10 +92,22 @@ def remove_animal( id ):
     except(Exception, psycopg2.DatabaseError) as err:
         print( 'Remove animal failed on server', err )
     finally:
-        if connection is not None:
-            connection.close()
+        if(cursor):
+            cursor.close()
 
-
+#PUT
+@app.route( '/api/animals/<id>', methods=['PUT'])
+def update_exhibit( id ):
+    try:
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+        print( 'in PUT w:', request.json['exhibit_id'])
+        queryText = 'UPDATE "animals" SET "exhibit_id" = %s WHERE "id"=%s;'
+        # cursor.execute(queryText, )
+    except(Exception, psycopg2.DatabaseError) as err:
+        print( 'PUT animal failed on server', err )
+    finally:
+        if(cursor):
+            cursor.close()
 
 if __name__ == "__main__":
     app.run(debug=True)
